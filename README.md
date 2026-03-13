@@ -1,131 +1,131 @@
 # ECommerce API
 
-REST API для интернет-магазина на ASP.NET Core + PostgreSQL.
+REST API for an online store built with ASP.NET Core + PostgreSQL.
 
-## Стек технологий
+## Tech Stack
 
 - .NET 10 / ASP.NET Core Web API
 - PostgreSQL 16 + Entity Framework Core (Code First)
-- JWT-авторизация (access token)
+- JWT Authentication (access token)
 - FluentValidation
 - Swagger (Swashbuckle)
 - Docker + docker-compose
 - Rate Limiting (Microsoft.AspNetCore.RateLimiting)
 
-## Быстрый запуск (Docker)
+## Quick Start (Docker)
 
 ```bash
 docker-compose up --build
 ```
 
-API будет доступен по адресу: **http://localhost:8080**  
+API available at: **http://localhost:8080**  
 Swagger UI: **http://localhost:8080**
 
-## Тестовые учётные записи (Seed)
+## Test Accounts (Seed Data)
 
-| Роль     | Email              | Пароль        |
+| Role     | Email              | Password      |
 |----------|--------------------|---------------|
 | Admin    | admin@store.com    | Admin123!     |
 | Customer | customer@store.com | Customer123!  |
 
-## Как тестировать в Swagger
+## How to Test via Swagger
 
-1. Откройте http://localhost:8080 в браузере
-2. Выполните `POST /api/auth/login` с телом:
+1. Open http://localhost:8080 in a browser
+2. Execute `POST /api/auth/login` with body:
    ```json
    {
      "email": "admin@store.com",
      "password": "Admin123!"
    }
    ```
-3. Скопируйте значение `token` из ответа
-4. Нажмите кнопку **Authorize** (🔒) в верхней части страницы
-5. Введите токен (без префикса `Bearer`)
-6. Нажмите **Authorize** — теперь все защищённые эндпоинты доступны
+3. Copy the `token` value from the response
+4. Click the **Authorize** button (🔒) at the top of the page
+5. Paste the token (without the `Bearer` prefix)
+6. Click **Authorize** — all protected endpoints are now accessible
 
-## Эндпоинты
+## Endpoints
 
-### Аутентификация
-| Метод | URL                  | Описание                |
-|-------|----------------------|-------------------------|
-| POST  | /api/auth/register   | Регистрация покупателя  |
-| POST  | /api/auth/login      | Авторизация (получение JWT) |
+### Authentication
+| Method | URL                  | Description              |
+|--------|----------------------|--------------------------|
+| POST   | /api/auth/register   | Register a new customer  |
+| POST   | /api/auth/login      | Login (get JWT token)    |
 
-### Категории (Admin для CUD, GET — публичный)
-| Метод  | URL                    | Описание             |
+### Categories (Admin for CUD, GET is public)
+| Method | URL                    | Description          |
 |--------|------------------------|----------------------|
-| GET    | /api/categories        | Список категорий     |
-| GET    | /api/categories/{id}   | Категория по ID      |
-| POST   | /api/categories        | Создать категорию    |
-| PUT    | /api/categories/{id}   | Обновить категорию   |
-| DELETE | /api/categories/{id}   | Удалить категорию    |
+| GET    | /api/categories        | List all categories  |
+| GET    | /api/categories/{id}   | Get category by ID   |
+| POST   | /api/categories        | Create category      |
+| PUT    | /api/categories/{id}   | Update category      |
+| DELETE | /api/categories/{id}   | Delete category      |
 
-### Товары (Admin для CUD, GET — публичный)
-| Метод  | URL                  | Описание                          |
-|--------|----------------------|-----------------------------------|
-| GET    | /api/products        | Список с фильтрами + пагинация   |
-| GET    | /api/products/{id}   | Товар по ID                       |
-| POST   | /api/products        | Создать товар                     |
-| PUT    | /api/products/{id}   | Обновить товар                    |
-| DELETE | /api/products/{id}   | Удалить товар                     |
+### Products (Admin for CUD, GET is public)
+| Method | URL                  | Description                        |
+|--------|----------------------|------------------------------------|
+| GET    | /api/products        | List with filters + pagination     |
+| GET    | /api/products/{id}   | Get product by ID                  |
+| POST   | /api/products        | Create product                     |
+| PUT    | /api/products/{id}   | Update product                     |
+| DELETE | /api/products/{id}   | Delete product                     |
 
-Query-параметры для GET /api/products:
-- `search` — поиск по названию
-- `categoryId` — фильтр по категории
-- `page` — номер страницы (по умолчанию 1)
-- `pageSize` — размер страницы (по умолчанию 10, максимум 50)
+Query parameters for GET /api/products:
+- `search` — search by name
+- `categoryId` — filter by category
+- `page` — page number (default: 1)
+- `pageSize` — page size (default: 10, max: 50)
 
-### Корзина (требуется авторизация)
-| Метод  | URL                        | Описание                  |
-|--------|----------------------------|---------------------------|
-| GET    | /api/cart                  | Просмотр корзины          |
-| POST   | /api/cart                  | Добавить товар в корзину  |
-| DELETE | /api/cart/{productId}      | Удалить товар из корзины  |
+### Cart (requires authentication)
+| Method | URL                        | Description             |
+|--------|----------------------------|-------------------------|
+| GET    | /api/cart                  | View cart               |
+| POST   | /api/cart                  | Add product to cart     |
+| DELETE | /api/cart/{productId}      | Remove product from cart|
 
-### Заказы (требуется авторизация)
-| Метод | URL                  | Описание                    |
-|-------|----------------------|-----------------------------|
-| POST  | /api/orders          | Оформить заказ (checkout)   |
-| GET   | /api/orders          | Мои заказы                  |
-| GET   | /api/orders/{id}     | Заказ по ID                 |
+### Orders (requires authentication)
+| Method | URL                  | Description              |
+|--------|----------------------|--------------------------|
+| POST   | /api/orders          | Checkout (create order)  |
+| GET    | /api/orders          | Get my orders            |
+| GET    | /api/orders/{id}     | Get order by ID          |
 
-### Админ — все заказы
-| Метод | URL                  | Описание                    |
-|-------|----------------------|-----------------------------|
-| GET   | /api/admin/orders    | Все заказы (только Admin)   |
+### Admin — All Orders
+| Method | URL                  | Description              |
+|--------|----------------------|--------------------------|
+| GET    | /api/admin/orders    | All orders (Admin only)  |
 
-## Локальная разработка (без Docker)
+## Local Development (without Docker)
 
-1. Установите PostgreSQL и создайте БД `ecommerce_db`
-2. Обновите строку подключения в `appsettings.Development.json`
-3. Запустите:
+1. Install PostgreSQL and create database `ecommerce_db`
+2. Update the connection string in `appsettings.Development.json`
+3. Run:
 ```bash
 cd ECommerce.API
 dotnet ef migrations add InitialCreate
 dotnet run
 ```
 
-## Структура проекта
+## Project Structure
 
 ```
 ECommerce.API/
-├── Controllers/          # API-контроллеры
+├── Controllers/          # API controllers
 ├── Common/
-│   ├── Exceptions/       # Кастомные исключения
+│   ├── Exceptions/       # Custom exceptions
 │   ├── Middleware/        # ExceptionHandlingMiddleware
-│   └── Extensions/       # Extension-методы
+│   └── Extensions/       # Extension methods
 ├── Data/                 # DbContext + Seed
-├── DTOs/                 # Request/Response модели
+├── DTOs/                 # Request/Response models
 │   ├── Auth/
 │   ├── Cart/
 │   ├── Category/
 │   ├── Order/
 │   └── Product/
-├── Entities/             # EF Core сущности
-├── Services/             # Бизнес-логика
+├── Entities/             # EF Core entities
+├── Services/             # Business logic
 │   └── Interfaces/
 ├── Validators/           # FluentValidation
-├── Program.cs            # Точка входа + конфигурация
+├── Program.cs            # Entry point + configuration
 ├── appsettings.json
 └── appsettings.Development.json
 ```
