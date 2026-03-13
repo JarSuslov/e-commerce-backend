@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: ecommerce-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ecommerce_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ecommerce-api
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=ecommerce_db;Username=postgres;Password=postgres
+      - Jwt__Key=SuperSecretProductionKey_MustBeAtLeast32Characters!!
+      - Jwt__Issuer=ECommerceAPI
+      - Jwt__Audience=ECommerceClient
+      - Jwt__ExpireHours=24
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
